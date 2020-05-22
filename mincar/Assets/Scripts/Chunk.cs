@@ -32,6 +32,7 @@ public class Chunk {
         	Init();
     }
 
+    // 正在生成地圖
     public void Init () {
 
         chunkObject = new GameObject();
@@ -48,7 +49,8 @@ public class Chunk {
         UpdateChunk();
     }
 
-	void PopulateVoxelMap () {
+	// 地圖分層 泥土石頭等
+    void PopulateVoxelMap () {
 		
 		for (int y = 0; y < VoxelData.ChunkHeight; y++) {
 			for (int x = 0; x < VoxelData.ChunkWidth; x++) {
@@ -67,10 +69,12 @@ public class Chunk {
 
         ClearMeshData();
 
-		for (int y = 0; y < VoxelData.ChunkHeight; y++) {
+		// 生成方塊
+        for (int y = 0; y < VoxelData.ChunkHeight; y++) {
 			for (int x = 0; x < VoxelData.ChunkWidth; x++) {
 				for (int z = 0; z < VoxelData.ChunkWidth; z++) {
 
+                    // 在自己視野中的才生成
                     if (world.blocktypes[voxelMap[x,y,z]].isSolid)
 					    UpdateMeshData (new Vector3(x, y, z));
 				}
@@ -80,6 +84,8 @@ public class Chunk {
         CreateMesh();
 	}
 
+    // 需清除超過視野所生成的meah
+    // 重新設目前位置為基準
     void ClearMeshData () {
 
         vertexIndex = 0;
@@ -88,6 +94,7 @@ public class Chunk {
         uvs.Clear();
     }
 
+    // 目前有在active
     public bool isActive {
 
         get { return _isActive; }
@@ -99,11 +106,13 @@ public class Chunk {
         }
     }
 
+    // 取得目前這個方塊的絕對位置
     public Vector3 position {
 
         get { return chunkObject.transform.position; }
     }
 
+    // 回傳方塊是否包在裡面
     bool IsVoxelInChunk (int x, int y, int z) {
 
         if (x < 0 || x > VoxelData.ChunkWidth - 1 || y < 0 || y > VoxelData.ChunkHeight - 1 || z < 0 || z > VoxelData.ChunkWidth - 1)
@@ -112,6 +121,7 @@ public class Chunk {
             return true;
     }
 
+    // 
     public void EditVoxel (Vector3 pos, byte newID) {
 
         int xCheck = Mathf.FloorToInt(pos.x);
@@ -124,10 +134,10 @@ public class Chunk {
         voxelMap[xCheck, yCheck, zCheck] = newID;
 
         UpdateSurroundingVoxels(xCheck, yCheck, zCheck);
-        // Update Surrounding Chunks
         UpdateChunk();
     }
 
+    // 更新周圍voxel
     void UpdateSurroundingVoxels (int x, int y, int z) {
 
         Vector3 thisVoxel = new Vector3(x, y, z);
@@ -142,6 +152,7 @@ public class Chunk {
         }
     }
 
+    //  判斷那方塊是否被包在裡面
 	bool CheckVoxel (Vector3 pos) {
 
 		int x = Mathf.FloorToInt (pos.x);
@@ -166,7 +177,8 @@ public class Chunk {
         return voxelMap[xCheck, yCheck, zCheck];
     }
 
-	void UpdateMeshData (Vector3 pos) {
+	// 生成各方塊
+    void UpdateMeshData (Vector3 pos) {
 
 		for (int p = 0; p < 6; p++) { 
 
@@ -192,6 +204,7 @@ public class Chunk {
 		}
 	}
 
+    // 使用meah把整個地圖做出來
 	void CreateMesh () {
 
 		Mesh mesh = new Mesh ();
@@ -204,6 +217,7 @@ public class Chunk {
 		meshFilter.mesh = mesh;
 	}
 
+    // 貼上方塊材質
     void AddTexture (int textureID) {
 
         float y = textureID / VoxelData.TextureAtlasSizeInBlocks;
@@ -222,6 +236,7 @@ public class Chunk {
     }
 }
 
+    /* 座標 */
 public class ChunkCoord {
 
     public int x;

@@ -28,6 +28,7 @@ public class World : MonoBehaviour {
 
         Random.InitState(seed);
 
+        // 使玩家視野在世界正中間
         spawnPosition = new Vector3((VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f, VoxelData.ChunkHeight - 50f, (VoxelData.WorldSizeInChunks * VoxelData.ChunkWidth) / 2f);
         GenerateWorld();
         playerLastChunkCoord = GetChunkCoordFromVector3(player.position);
@@ -48,6 +49,7 @@ public class World : MonoBehaviour {
             debugScreen.SetActive(!debugScreen.activeSelf);
     }
 
+    // 生成世界
     void GenerateWorld () {
 
         for (int x = (VoxelData.WorldSizeInChunks / 2) - VoxelData.ViewDistanceInChunks; x < (VoxelData.WorldSizeInChunks / 2) + VoxelData.ViewDistanceInChunks; x++) {
@@ -146,22 +148,25 @@ public class World : MonoBehaviour {
     }
 
 
+    // 去回傳給chunk 說明這一層方塊需要啥
     public byte GetVoxel (Vector3 pos) {
 
         int yPos = Mathf.FloorToInt(pos.y);
 
         /* IMMUTABLE PASS */
 
-        // If outside world, return air.
+        // 假如超過世界回傳air
         if (!IsVoxelInWorld(pos))
             return 0;
 
-        // If bottom block of chunk, return bedrock.
+        // 假如是底部回傳基岩
         if (yPos == 0)
             return 1;
 
+
         /* BASIC TERRAIN PASS */
 
+        /* 之後修改這條 我們只需要簡單的一個平面*/
         int terrainHeight = Mathf.FloorToInt(biome.terrainHeight * Noise.Get2DPerlin(new Vector2(pos.x, pos.z), 0, biome.terrainScale)) + biome.solidGroundHeight;
         byte voxelValue = 0;
 
@@ -174,7 +179,8 @@ public class World : MonoBehaviour {
         else
             voxelValue = 2;
 
-        /* SECOND PASS */
+
+        /* SECOND PASS  也須修改*/
 
         if (voxelValue == 2) {
 
@@ -216,7 +222,8 @@ public class World : MonoBehaviour {
 public class BlockType {
 
     public string blockName;
-    public bool isSolid;
+    public bool isSolid; 
+    public Sprite icon;
 
     [Header("Texture Values")]
     public int backFaceTexture;
